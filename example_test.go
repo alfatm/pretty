@@ -1,6 +1,10 @@
 package pretty
 
-import "fmt"
+import (
+	"fmt"
+	"testing"
+	"time"
+)
 
 // Recall that if you pass a cyclic object by value then a copy is made.
 // The copy is not part of the cycle.
@@ -140,8 +144,8 @@ func ExamplePrint_floatMap() {
 func ExamplePrint_stringMap() {
 	type T map[string]int
 	Print(T{
-		"a": 5,
-		"b": 6,
+		"a":  5,
+		"b":  6,
 		"α": 7,
 	})
 	// Output: T{
@@ -179,4 +183,21 @@ func ExamplePrint_indent() {
 	// ----A: 5
 	// ----C: 6
 	// }
+}
+
+func TestPrintTime(t *testing.T) {
+	type T struct {
+		A time.Time
+		B *time.Time
+		C *time.Time
+	}
+	orig := Indent
+	Indent = "----"
+	dt := time.Now()
+	Print(T{
+		A: dt,
+		B: &dt,
+		C: nil,
+	})
+	Indent = orig
 }

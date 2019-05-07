@@ -12,6 +12,7 @@ import (
 	"reflect"
 	"sort"
 	"strconv"
+	"time"
 	"unicode"
 	"unicode/utf8"
 )
@@ -67,6 +68,8 @@ func String(v interface{}) string {
 	return buf.String()
 }
 
+var timeType reflect.Type = reflect.TypeOf(time.Time{})
+
 // print returns whether the value is of a non-composite type.
 func print(out io.Writer, path map[reflect.Value]bool, indent string, v reflect.Value) {
 	if !v.IsValid() {
@@ -117,6 +120,13 @@ func print(out io.Writer, path map[reflect.Value]bool, indent string, v reflect.
 		pr(out, strconv.Quote(v.String()))
 
 	case reflect.Struct:
+		if v.Type() == timeType {
+			if dt, ok := v.Interface().(time.Time); ok {
+				pr(out, dt.Format(time.RFC3339))
+				return
+			}
+		}
+
 		printStruct(out, path, indent, v)
 
 	case reflect.Map:
